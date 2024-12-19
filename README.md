@@ -27,4 +27,4 @@ Oyunu yerel bilgisayarınızda çalıştırmak için aşağıdaki adımları izl
 
 1. Bu repoyu klonlayın:
    ```bash
-   git clone https://github.com/kullanici-adiniz/gelismis-yilan-oyunu.git
+   git clone https://github.com/berkwyweb/2-player-snake-game.git
