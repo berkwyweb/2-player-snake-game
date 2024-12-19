@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Snake Game</title>
+    <style>
+/* Genel Sayfa Stili */
+/* Genel Sayfa Stili */
+body {
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(135deg, #2c3e50, #34495e); /* Koyu mavi gri geçiş */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    color: white;
+    font-family: 'Poppins', sans-serif; /* Modern font */
+    flex-direction: column;
+    overflow: hidden; /* Scroll engelleme */
+}
+
+/* Canvas */
+canvas {
+    background-color: #34495e;
+    border: 3px solid #7f8c8d;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.4); /* Yumuşak glow */
+    transition: all 0.5s ease-in-out;
+}
+
+/* Sidebar */
+#sidebar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 240px;
+    background-color: rgba(44, 62, 80, 0.9); /* Koyu mavi gri */
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    color: white;
+    box-shadow: 5px 0 25px rgba(0, 0, 0, 0.8);
+    border-radius: 15px;
+}
+
+/* Menü öğeleri */
+.menu-item {
+    margin-bottom: 20px;
+    font-size: 22px;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 14px;
+    text-align: center;
+    border-radius: 10px;
+    transition: background 0.3s ease, transform 0.3s ease;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
+}
+
+.menu-item:hover {
+    background-color: #2980b9;
+    transform: scale(1.05);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.7); /* Hoverda soft glow */
+}
+
+/* Butonlar */
+.button {
+    background-color: #16a085; /* Canlı yeşil */
+    padding: 12px 22px;
+    border: none;
+    color: white;
+    cursor: pointer;
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s ease, transform 0.3s ease;
+}
+
+.button:hover {
+    background-color: #1abc9c;
+    box-shadow: 0 8px 20px rgba(26, 188, 156, 0.6); /* Hoverda glow */
+    transform: translateY(-4px); /* Buton yukarı kayar */
+}
+
+/* Color Selector */
+#colorSelector {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+#colorSelector input {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    transition: all 0.3s ease;
+}
+
+#colorSelector input:hover {
+    transform: scale(1.3); /* Renk çarkları hoverda büyür */
+}
+
+/* Game Over */
+#gameOver {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 35px;
+    font-size: 36px;
+    font-weight: bold;
+    border-radius: 15px;
+    display: none;
+    text-align: center;
+    box-shadow: 0 0 40px rgba(255, 0, 0, 0.7); /* Kırmızı glow */
+    animation: pulse 1.5s ease-in-out infinite; /* Animasyon efekti */
+}
+
+/* Skor */
+#score {
+    font-size: 30px;
+    font-weight: bold;
+    margin-bottom: 30px;
+    text-shadow: 3px 3px 10px rgba(255, 255, 255, 0.6); /* Glow efekti */
+}
+
+/* Başlangıç Butonu */
+#startButton {
+    margin-top: 20px;
+    font-size: 22px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    background-color: #27ae60; /* Yeşil */
+    border-radius: 12px;
+    padding: 14px 28px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s ease;
+}
+
+#startButton:hover {
+    background-color: #2ecc71;
+    box-shadow: 0 10px 25px rgba(46, 204, 113, 0.7); /* Hoverda glow */
+    transform: translateY(-5px); /* Buton yukarı kayar */
+}
+
+/* Glow Animasyonu */
+@keyframes pulse {
+    0% { text-shadow: 0 0 25px #e74c3c, 0 0 35px #e74c3c, 0 0 50px #e74c3c; }
+    50% { text-shadow: 0 0 35px #e74c3c, 0 0 45px #e74c3c, 0 0 55px #e74c3c; }
+    100% { text-shadow: 0 0 25px #e74c3c, 0 0 35px #e74c3c, 0 0 50px #e74c3c; }
+}
+
+/* Animasyonlu Arka Plan */
+@keyframes gradientBackground {
+    0% { background: linear-gradient(135deg, #2c3e50, #34495e); }
+    50% { background: linear-gradient(135deg, #34495e, #2c3e50); }
+    100% { background: linear-gradient(135deg, #2c3e50, #34495e); }
+}
+
+body {
+    animation: gradientBackground 5s ease-in-out infinite;
+}
+
+
+    </style>
+</head>
+<body>
+    <div id="score">Score: 0 - 0</div>
+    <div id="sidebar">
+        <div id="difficultySelector" class="menu-item">Zorluk: Normal</div>
+        <div id="gameModeSelector" class="menu-item">Mode: Tek kişilik</div>
+        <button class="button" onclick="switchGameMode()">Mod değiştir</button>
+        <button class="button" onclick="changeDifficulty('Kolay')">Kolay</button>
+        <button class="button" onclick="changeDifficulty('Normal')">Normal</button>
+        <button class="button" onclick="changeDifficulty('Zor')">Zor</button>
+    </div>
+
+    <div id="gameOver">Oyun bitti! Tekrar başlamak için bir tuşa tıkla.</div>
+    <canvas id="gameCanvas" width="600" height="400"></canvas>
+    <!-- Başlangıç butonu ekliyoruz -->
+    <button id="startButton" class="button" onclick="startGame()">Start Game</button>
+
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        const scale = 20;
+        const rows = canvas.height / scale;
+        const columns = canvas.width / scale;
+
+        let snake1, snake2, food, powerUp, direction1, direction2, gameInterval, score1, score2;
+        let gameSpeed = 100;
+        let difficulty = 'Normal';
+        let gameMode = 'Single';  // Single Player or PvP mode
+        let isGameOver = false;
+        let speedPowerActive = false;
+        let slowPowerActive = false;
+        let player1Color = "#00ff00";  // Default Player 1 color
+        let player2Color = "#ffff00";  // Default Player 2 color
+
+        function startGame() {
+            score1 = 0;
+            score2 = 0;
+            document.getElementById('score').textContent = "Score: " + score1 + " - " + score2;
+            snake1 = new Snake('player1', player1Color);
+            snake2 = new Snake('player2', player2Color);
+            food = new Food();
+            powerUp = new PowerUp();
+            direction1 = 'right';
+            direction2 = 'left';
+            isGameOver = false;
+            document.getElementById('startButton').style.display = 'none';  // Hide the start button
+            clearInterval(gameInterval);
+            gameInterval = setInterval(gameLoop, gameSpeed);
+        }
+
+        // Yılan sınıfı
+        function Snake(player, color) {
+            this.player = player;
+            this.body = [{ x: 5, y: 5 }];
+            this.length = 1;
+            this.color = color;
+
+            this.draw = function () {
+                ctx.fillStyle = this.color;
+                for (let i = 0; i < this.body.length; i++) {
+                    ctx.fillRect(this.body[i].x * scale, this.body[i].y * scale, scale, scale);
+                }
+            };
+
+            this.move = function (direction) {
+                const head = { ...this.body[0] };
+
+                if (direction === 'up') head.y -= 1;
+                if (direction === 'down') head.y += 1;
+                if (direction === 'left') head.x -= 1;
+                if (direction === 'right') head.x += 1;
+
+                this.body.unshift(head);
+
+                if (head.x === food.x && head.y === food.y) {
+                    this.length++;
+                    if (this.player === 'player1') {
+                        score1 += 10;
+                    } else {
+                        score2 += 10;
+                    }
+                    document.getElementById('score').textContent = "Score: " + score1 + " - " + score2;
+                    food = new Food();
+                    powerUp = new PowerUp();
+                } else {
+                    this.body.pop();
+                }
+
+                // Güçlendiricilere çarpma kontrolü
+                if (head.x === powerUp.x && head.y === powerUp.y) {
+                    if (powerUp.type === 'speed' && !speedPowerActive) {
+                        if (slowPowerActive) {
+                            slowPowerActive = false;
+                            gameSpeed = 100;
+                        }
+                        speedPowerActive = true;
+                        gameSpeed = 50;
+                        clearInterval(gameInterval);
+                        gameInterval = setInterval(gameLoop, gameSpeed);
+                    }
+                    if (powerUp.type === 'slow' && !slowPowerActive) {
+                        if (speedPowerActive) {
+                            speedPowerActive = false;
+                            gameSpeed = 100;
+                        }
+                        slowPowerActive = true;
+                        gameSpeed = 200;
+                        clearInterval(gameInterval);
+                        gameInterval = setInterval(gameLoop, gameSpeed);
+                    }
+                    powerUp = new PowerUp();
+                }
+            };
+
+            this.checkCollision = function () {
+                const head = this.body[0];
+                if (head.x < 0 || head.x >= columns || head.y < 0 || head.y >= rows) return true;
+                for (let i = 1; i < this.body.length; i++) {
+                    if (head.x === this.body[i].x && head.y === this.body[i].y) return true;
+                }
+                return false;
+            };
+        }
+
+        // Yılan yediğinde gelen besin
+        function Food() {
+            this.x = Math.floor(Math.random() * columns);
+            this.y = Math.floor(Math.random() * rows);
+
+            this.draw = function () {
+                ctx.fillStyle = "#FF0000";
+                ctx.fillRect(this.x * scale, this.y * scale, scale, scale);
+            };
+        }
+
+        // Güçlendirici
+        function PowerUp() {
+            this.x = Math.floor(Math.random() * columns);
+            this.y = Math.floor(Math.random() * rows);
+            const powerUpTypes = ['speed', 'slow'];
+            this.type = powerUpTypes[Math.floor(Math.random() * powerUpTypes.length)];
+
+            this.draw = function () {
+                ctx.fillStyle = this.type === 'speed' ? '#00FF00' : '#0000FF';
+                ctx.fillRect(this.x * scale, this.y * scale, scale, scale);
+            };
+        }
+
+        // Oyun döngüsü
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            snake1.move(direction1);
+            snake1.draw();
+            if (gameMode === 'PvP') {
+                snake2.move(direction2);
+                snake2.draw();
+            }
+            food.draw();
+            powerUp.draw();
+
+            if (snake1.checkCollision() || (gameMode === 'PvP' && snake2.checkCollision())) {
+                endGame();
+            }
+        }
+
+        // Oyun bitişi
+        function endGame() {
+            isGameOver = true;
+            clearInterval(gameInterval);
+            document.getElementById('gameOver').style.display = 'block';
+        }
+
+        // Tuşlara basma
+        window.addEventListener('keydown', (e) => {
+            if (isGameOver) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    startGame();
+                    document.getElementById('gameOver').style.display = 'none';
+                }
+                return;
+            }
+
+            if (e.key === 'ArrowUp' && direction1 !== 'down') {
+                direction1 = 'up';
+            }
+            if (e.key === 'ArrowDown' && direction1 !== 'up') {
+                direction1 = 'down';
+            }
+            if (e.key === 'ArrowLeft' && direction1 !== 'right') {
+                direction1 = 'left';
+            }
+            if (e.key === 'ArrowRight' && direction1 !== 'left') {
+                direction1 = 'right';
+            }
+
+            // PvP modunda Player 2'nin kontrolleri
+            if (gameMode === 'PvP') {
+                if (e.key === 'w' && direction2 !== 'down') {
+                    direction2 = 'up';
+                }
+                if (e.key === 's' && direction2 !== 'up') {
+                    direction2 = 'down';
+                }
+                if (e.key === 'a' && direction2 !== 'right') {
+                    direction2 = 'left';
+                }
+                if (e.key === 'd' && direction2 !== 'left') {
+                    direction2 = 'right';
+                }
+            }
+        });
+
+        // Zorluk değiştirme
+        function changeDifficulty(level) {
+            difficulty = level;
+            if (difficulty === 'Kolay') {
+                gameSpeed = 150;
+            } else if (difficulty === 'Normal') {
+                gameSpeed = 100;
+            } else if (difficulty === 'Zor') {
+                gameSpeed = 50;
+            }
+            if (!isGameOver) {
+                clearInterval(gameInterval);
+                gameInterval = setInterval(gameLoop, gameSpeed);
+            }
+        }
+
+        // Mod değiştirme
+        function switchGameMode() {
+            if (gameMode === 'Single') {
+                gameMode = 'PvP';
+                document.getElementById('gameModeSelector').textContent = "Mode: PvP";
+            } else {
+                gameMode = 'Single';
+                document.getElementById('gameModeSelector').textContent = "Mode: Tek kişilik";
+            }
+            if (!isGameOver) {
+                startGame();
+            }
+        }
+    </script>
+</body>
+</html>
