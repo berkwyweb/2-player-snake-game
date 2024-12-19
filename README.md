@@ -17,8 +17,6 @@ Bu proje, klasik Yılan oyununun gelişmiş bir versiyonudur. Farklı zorluk sev
   - **Hız Güçlendirici**: Oyun hızını artırır.
   - **Yavaş Güçlendirici**: Oyun hızını düşürür.
 
-- **Özelleştirilebilir Yılan Renkleri**: Her oyuncu yılanının rengini seçebilir.
-
 - **Skor Tablosu**: Hem Tek oyunculu hem de PvP modlarında oyuncuların skorlarını takip eder.
 
 ## Kurulum
